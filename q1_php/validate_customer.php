@@ -1,44 +1,57 @@
 <?php
 
-	// $host = "localhost"; // Host name 
-	// $username = "root"; // Mysql username 
-	// $password = ""; // Mysql password 
-	// $db_name = "hw3_ex1"; // Database name 
-	// $tbl_name = "customer"; // Table name 
+// Connect to db
+require_once('mysqli_connect.php');
 
-	// // Connect to server and select databse.
-	// mysql_connect("$host", "$username", "$password")OR die("cannot connect"); 
-	// mysql_select_db("$db_name")OR die("cannot select DB");
+// phone and keyword sent from form
+$phone = $_POST['phone'];
+$keyword = $_POST['keyword'];
 
-	require_once('mysqli_connect.php');
+// Protect from MySQL injection
+$phone = stripslashes($phone);
+$dbc->real_escape_string($phone);
 
-	// username and password sent from form 
-	$phone = $_POST['phone'];
-	$keyword = $_POST['keyword'];
+// SQL query: Select customer whose phone number matches the number entered in the form of previous page
+$find_customer = "SELECT * FROM customer WHERE phone = ? ";
 
-	// To protect MySQL injection
-	$phone = stripslashes($phone);
-	$phone = mysql_real_escape_string($phone);
+// Prepare statement
+if ($stmt = $dbc->prepare($find_customer)) {
 
-	// SQL query
-	$find_customer = "SELECT * FROM customer WHERE phone = '$phone'";
-	$result_customer = mysql_query($find_customer);
+	// Bind parameters
+	$stmt->bind_param("s", $phone);
 
-	// Mysql_num_row is counting table row
-	$count_customer = mysql_num_rows($result_customer);
+	// Execute prepared statement
+	$stmt->execute();
 
-	// If result matched $myusername and $mypassword, table row must be 1 row
-	if($count_customer == 1) {
+	// Store result
+	$stmt->store_result();
 
-		// Register $myusername, $mypassword and redirect to file "login_success.php"
-		// session_register("phone");
-		// session_register("keyword");
-		$_SESSION["phone"] = $phone;
-		$_SESSION["keyword"] = $keyword;
-		header("location:order_new.php");
-	}
-	else {
-		echo "Wrong Username or Password";
-	}
+	// Check the number of rows in the result (it has to be 1, due to unique phone numbers identifing customers)
+	$count_customer = $stmt->num_rows;
+
+	// Free result
+    $stmt->free_result();
+
+	// Close statement
+    $stmt->close();
+}
+
+// Close connection
+$dbc->close();
+
+// If phone number is in db, query was successful
+if($count_customer == 1) {
+	// Store phone and keyword in session and redirect to file "order_new.php"
+	session_start();
+	$_SESSION['phone'] = $phone;
+	$_SESSION['keyword'] = $keyword;
+	session_write_close();
+	header("Location:order_new.php");
+}
+else {
+	// If number is not on db, display error message
+	echo "Phone number doesn't exist in database";
+	echo '<br><br><a href="search_sandwiches.php" style="background-color:#CCCCCC">Go back</a>';
+}
 
 ?>

@@ -1,3 +1,4 @@
+<!-- Form to get keyword and phone number -->
 <table width="300" border="0" align="center" cellpadding="0" cellspacing="1" bgcolor="#CCCCCC">
 	<tr>
 		<form name="form1" method="post" action="validate_customer.php">
@@ -14,7 +15,7 @@
 					<tr>
 						<td>Phone number</td>
 						<td>:</td>
-						<td><input name="phone_number" type="text" id="phone_number"></td>
+						<td><input name="phone" type="text" id="phone"></td>
 					</tr>
 					<tr>
 						<td>&nbsp;</td>
@@ -24,5 +25,15 @@
 				</table>
 			</td>
 		</form>
+	</tr>
+</table>
+<br>
+
+<!-- Provide user a link to see all orders in database -->
+<table width="300" border="0" align="center" cellpadding="0" cellspacing="1" bgcolor="#CCCCCC">
+	<tr>
+		<td>
+			<a href="order_show.php">Show all orders in database</a>
+		</td>
 	</tr>
 </table>
